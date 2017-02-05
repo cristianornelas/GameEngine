@@ -5,6 +5,7 @@
  */
 package gameengine;
 
+import entities.Ammo;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -39,6 +40,10 @@ import textures.ModelTexture;
  */
 public class GameEngine {
 
+    private final static int MISSILE_DMG = 10;
+    private final static float MISSILE_SPEED = 200f;
+    private final static float MISSILE_DISTANCECAP = 200f;
+    
     public static void main(String[] args) {
                
         DisplayManager.createDisplay();
@@ -47,19 +52,39 @@ public class GameEngine {
         TextMaster.init(loader);
         
         FontType font = new FontType(loader.loadTexture("ocr"), new File("res/ocr.fnt"));
-        GUIText text = new GUIText("This is a test text!", 1, font, new Vector2f(0,0), 1f, true);
         
         RawModel playerModel = OBJLoader.loadObjModel("heli", loader);
-        TexturedModel playerTexture = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("green")));
-        Player player = new Player(playerTexture, new Vector3f(0,0,0), 0,0,0,1f);        
+        TexturedModel playerTexture1 = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("grey")));
+                
+        
+        int seed = new Random().nextInt(1000000000);
+        
+        Terrain terrain = new Terrain(-1, -1, loader, new ModelTexture(loader.loadTexture("sand")), seed);
+        
+        List<Player> team1 = new ArrayList<Player>();
+        Player player = new Player(playerTexture1, new Vector3f(-Terrain.getSize() + 800f, terrain.getHeightOfTerrain(-Terrain.getSize() + 800f, -500)+5f, -500), 0,180,0,1f);
+        team1.add(player);
+        for(int i=1; i<10; i++){
+            float x = -Terrain.getSize() + 800f + ((800/10) * i);
+            team1.add(new Player(playerTexture1, new Vector3f(x , terrain.getHeightOfTerrain(x, -500) , -500), 0,180,0,1f));
+        }
+        
+        TexturedModel playerTexture2 = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("green")));
+        List<Player> team2 = new ArrayList<Player>();
+        for(int i=0; i<10; i++){
+            float x = -Terrain.getSize() + 800f + ((800/10) * i);
+            team2.add(new Player(playerTexture2, new Vector3f(x , terrain.getHeightOfTerrain(x, -1900), -1900), 0, 0,0,1f));
+        }
+        
+        
+        RawModel missileModel = OBJLoader.loadObjModel("missile", loader);
+        TexturedModel missileTexture = new TexturedModel(missileModel, new ModelTexture(loader.loadTexture("missileTex")));
+        List<Ammo> missiles = new ArrayList<Ammo>();
+        List<Ammo> explodedMissiles = new ArrayList<Ammo>();
         
         Camera camera = new Camera(player);       
         Light light = new Light(new Vector3f(20000,40000,20000), new Vector3f(1,1,1)); 
         
-        Terrain terrain = new Terrain(-1, -1, loader, new ModelTexture(loader.loadTexture("sand")), "heightmap");
-        Terrain terrain2 = new Terrain(0, -1, loader, new ModelTexture(loader.loadTexture("sand")), "heightmap");
-        Terrain terrain3 = new Terrain(-1, 0, loader, new ModelTexture(loader.loadTexture("sand")), "heightmap");
-        Terrain terrain4 = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("sand")), "heightmap");
         
         RawModel treeModel = OBJLoader.loadObjModel("tree", loader);
         TexturedModel treeTexture = new TexturedModel(treeModel, new ModelTexture(loader.loadTexture("treeTex")));
@@ -67,77 +92,103 @@ public class GameEngine {
         Random random = new Random();
         Entity entity;
         int tx, tz;
-        for(int i=-5; i<5; i++){
-            for(int j=-5; j<5; j++){
-                float x = random.nextFloat() * Terrain.getSize() / 5 * i;
-                float z = random.nextFloat() * Terrain.getSize() / 5 * j;
-                float y = 0;
-                
-                if(x > 0)
-                    tx = (int) ((x + (float) Terrain.getSize()) / (float) Terrain.getSize()) - 1;
-                else
-                    tx = (int) (x / (float) Terrain.getSize()) - 1;
-
-                if(z > 0)
-                    tz = (int) ((z + (float) Terrain.getSize()) / (float) Terrain.getSize()) - 1;
-                else
-                    tz = (int) (z / (float) Terrain.getSize()) - 1;
-                if(tx == -1 && tz == -1)
-                    y = terrain.getHeightOfTerrain(x, z);
-                else if(tx == 0 && tz == -1)
-                    y = terrain2.getHeightOfTerrain(x, z);
-                else if(tx == -1 && tz == 0)
-                    y = terrain3.getHeightOfTerrain(x, z);
-                else if(tx == 0 && tz == 0)
-                    y = terrain4.getHeightOfTerrain(x, z);
+        for(int i=-15; i<0; i++){
+            for(int j=-15; j<0; j++){
+                float x = random.nextFloat() * Terrain.getSize() / 15 * i;
+                float z = random.nextFloat() * Terrain.getSize() / 15 * j;
+                float y = terrain.getHeightOfTerrain(x, z);
                 
                 entity = new Entity(treeTexture, new Vector3f(x, y, z), 0,0,0,1);
                 trees.add(entity);
             }
         }
         
+        
+        GUIText text = null;
+        
         GuiRenderer guiRenderer = new GuiRenderer(loader);
         List<GuiTexture> guis = new ArrayList<GuiTexture>();
-        GuiTexture gui = new GuiTexture(loader.loadTexture("aim"), new Vector2f(0, 0.5f), new Vector2f(0.1f, 0.1f));
-        guis.add(gui);
+        //GuiTexture gui = new GuiTexture(loader.loadTexture("aim"), new Vector2f(0, 0.5f), new Vector2f(0.1f, 0.1f));
+        //guis.add(gui);
         
         //GameLoop
         while(!Display.isCloseRequested()) {
-            int x,z;
+            if(text != null)
+                TextMaster.removeText(text);
             
-            if(player.getPosition().x > 0)
-                x = (int) ((player.getPosition().x + (float) Terrain.getSize()) / (float) Terrain.getSize()) - 1;
-            else
-                x = (int) (player.getPosition().x / (float) Terrain.getSize()) - 1;
+            text = new GUIText("Health: "+ player.getHealth()+" Ammo: "+player.getAmmo() + " - " + player.getKill() + "/" + player.getDeath()+ "/" + player.getAssists(), 1, font, new Vector2f(0,0), 1f, false);
             
-            if(player.getPosition().z > 0)
-                z = (int) ((player.getPosition().z + (float) Terrain.getSize()) / (float) Terrain.getSize()) - 1;
-            else
-                z = (int) (player.getPosition().z / (float) Terrain.getSize()) - 1;
-            
-            if(x == -1 && z == -1)
+            if(player.getPosition().x < -400 && player.getPosition().x > -2000 && player.getPosition().z < -400 && player.getPosition().z > -2000)
                 player.move(terrain);
-            else if(x == 0 && z == -1)
-                player.move(terrain2);
-            else if(x == -1 && z == 0)
-                player.move(terrain3);
-            else if(x == 0 && z == 0)
-                player.move(terrain4);
-            else
-                player.setPosition(new Vector3f(0,0,0));
+            else{
+                //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
+                if(player.getPosition().x >= -400){
+                    player.increaseRotations(0, 180, 0);
+                    player.getPosition().x -= 50;
+                }
+                if(player.getPosition().z >= -400){
+                   player.increaseRotations(0, 180, 0);
+                    player.getPosition().z -= 50;
+                }
+                if(player.getPosition().x <= -2000){
+                    player.increaseRotations(0, 180, 0);
+                    player.getPosition().x += 50;
+                }
+                if(player.getPosition().z <= -2000){
+                    player.increaseRotations(0, 180, 0);
+                    player.getPosition().z += 50;
+                }
+            }
             
             camera.move();
             
             renderer.processTerrain(terrain);
-            renderer.processTerrain(terrain2);
-            renderer.processTerrain(terrain3);
-            renderer.processTerrain(terrain4);
             
             for(Entity tree: trees){
                 renderer.processEntity(tree);
             }
             
             renderer.processEntity(player);
+            
+            for(int i=1; i<team1.size(); i++){
+                team1.get(i).moveBot(terrain, team2);
+            }
+            
+            for(int i=0; i<team2.size(); i++){
+                team2.get(i).moveBot(terrain, team1);
+            }
+            
+            for(Player ent: team1){
+                renderer.processEntity(ent);
+            }
+            
+            for(Player ent: team2){
+                renderer.processEntity(ent);
+            }
+            
+            
+            if(player.launchMissile()){
+                missiles.add(new Ammo(missileTexture, new Vector3f(player.getPosition().x, player.getPosition().y, player.getPosition().z), MISSILE_DMG, MISSILE_SPEED, MISSILE_DISTANCECAP , player.getRotX(), player.getRotY(), player.getRotZ(), 0.125f));
+            }
+            
+            
+            if(missiles.size() > 0){
+                for(Ammo missile: missiles){
+                    missile.move(terrain);
+                    renderer.processEntity(missile);
+                    if(missile.explodeMissile())
+                        explodedMissiles.add(missile);
+                }
+            }
+            
+            if(explodedMissiles.size() > 0){
+                for(Ammo exploded: explodedMissiles){
+                    missiles.remove(exploded);
+                }
+                explodedMissiles.clear();
+            }
+            System.out.println("Pos: " + team1.get(2).getPosition());
+            System.out.println("Dest: " + team1.get(2).getDestination());
             renderer.render(light, camera);
             guiRenderer.render(guis);
             TextMaster.render();

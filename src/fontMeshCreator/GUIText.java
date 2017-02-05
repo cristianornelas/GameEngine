@@ -70,6 +70,12 @@ public class GUIText {
 		// remove text
 	}
 
+    public void setTextString(String textString) {
+        this.textString = textString;
+    }
+        
+        
+
 	/**
 	 * @return The font used by this text.
 	 */
