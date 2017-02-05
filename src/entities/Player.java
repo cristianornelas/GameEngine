@@ -22,11 +22,18 @@ public class Player extends Entity {
     
     private static final float RUN_SPEED = 40;
     private static final float TURN_SPEED = 160;
+    private static final float HAUNTING_AREA = 400;
     private float currentSpeed = 0;
     private float currentTurnSpeed = 0;
     private int health = 100;
     private int ammo = 20;
     private int kill=0, death=0, assists=0;
+    
+    private Vector3f destination;
+    private float distance =-1;
+    private boolean traveling = false;
+    private Player target = null;
+    private boolean haunting = false;
 
     public int getKill() {
         return kill;
@@ -51,9 +58,6 @@ public class Player extends Entity {
     public void setAssists(int assists) {
         this.assists = assists;
     }
-    private Vector3f destination;
-    Player target;
-    private boolean traveling = false;
     
     
     public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
@@ -66,19 +70,190 @@ public class Player extends Entity {
     
     public void moveBot(Terrain terrain, List<Player> enemies){
         
-        //super.increaseRotations(0, 160 * DisplayManager.getFrameTimeSeconds(), 0);
-        float distance = RUN_SPEED * DisplayManager.getFrameTimeSeconds();
-        float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
-        float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
+        if(!traveling && !haunting){
+            destination = randomWalk(terrain);
+            traveling = true;
+            
+            distance = getDistance(destination);
+            
+            float distancePerSecond = RUN_SPEED * DisplayManager.getFrameTimeSeconds();
+            float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
+            float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
 
-        //NO FUCKING CLUE SE ISSO AQUI TA CERTO, NAO MANJO TRIGONOMETRIA =(
-        float dy = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
+            float dy = 0.2f;
+            
+            if(destination.y < super.getPosition().y)
+                dy = -dy;
+            else if (destination.y == super.getPosition().y)
+                dy = 0;
+            
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
+                super.increasePosition(dx, 0, dz);
+            else{
+                //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
+                if(super.getPosition().x >= -400){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x -= 50;
+                }
+                if(super.getPosition().z >= -400){
+                   super.increaseRotations(0, 180, 0);
+                    super.getPosition().z -= 50;
+                }
+                if(super.getPosition().x <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x += 50;
+                }
+                if(super.getPosition().z <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().z += 50;
+                }
+            }
+            
 
-        super.increasePosition(dx, dy, dz);
+            float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+            if(super.getPosition().y < terrainHeight)
+                super.getPosition().y = terrainHeight;
+            
+            
+        }
+        else if(traveling && getDistance(destination) >= distance  && !haunting){
+            Random random = new Random();
+            
+            int turnDir = random.nextInt(2) - 1;
+            //System.err.println(turnDir);
+            //System.err.println("DISTANCIA: "+ distance);
+            
+            distance = getDistance(destination);
+            super.increaseRotations(0, turnDir * TURN_SPEED * DisplayManager.getFrameTimeSeconds(), 0);
+            float distancePerSecond = RUN_SPEED * DisplayManager.getFrameTimeSeconds();
+            
+            float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
+            float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
 
-        float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
-        if(super.getPosition().y < terrainHeight)
-            super.getPosition().y = terrainHeight;
+            float dy = 0.2f;
+            
+            if(destination.y < super.getPosition().y)
+                dy = -dy;
+            else if (destination.y == super.getPosition().y)
+                dy = 0;
+
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
+                super.increasePosition(dx, 0, dz);
+            else{
+                //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
+                if(super.getPosition().x >= -400){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x -= 50;
+                }
+                if(super.getPosition().z >= -400){
+                   super.increaseRotations(0, 180, 0);
+                    super.getPosition().z -= 50;
+                }
+                if(super.getPosition().x <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x += 50;
+                }
+                if(super.getPosition().z <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().z += 50;
+                }
+            }
+
+            float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+            if(super.getPosition().y < terrainHeight)
+                super.getPosition().y = terrainHeight;
+            
+            
+        }
+        else if(traveling && getDistance(destination) < distance  && !haunting){
+            
+            distance = getDistance(destination);
+            float distancePerSecond = RUN_SPEED * DisplayManager.getFrameTimeSeconds();
+            float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
+            float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
+
+            float dy = 0.2f;
+            
+            if(destination.y < super.getPosition().y)
+                dy = -dy;
+            else if (destination.y == super.getPosition().y)
+                dy = 0;
+
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
+                super.increasePosition(dx, 0, dz);
+            else{
+                //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
+                if(super.getPosition().x >= -400){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x -= 50;
+                }
+                if(super.getPosition().z >= -400){
+                   super.increaseRotations(0, 180, 0);
+                    super.getPosition().z -= 50;
+                }
+                if(super.getPosition().x <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x += 50;
+                }
+                if(super.getPosition().z <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().z += 50;
+                }
+            }
+
+            float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+            if(super.getPosition().y < terrainHeight)
+                super.getPosition().y = terrainHeight;
+        }
+        else if(!traveling && haunting){
+            super.increaseRotations(target.getRotX(), target.getRotY(), target.getRotZ());
+            
+            float distancePerSecond = RUN_SPEED * DisplayManager.getFrameTimeSeconds();
+            float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
+            float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
+
+            float dy = 0.2f;
+            
+            if(target.getPosition().y < super.getPosition().y)
+                dy = -dy;
+            else if (target.getPosition().y == super.getPosition().y)
+                dy = 0;
+
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
+                super.increasePosition(dx, 0, dz);
+            else{
+                //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
+                if(super.getPosition().x >= -400){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x -= 50;
+                }
+                if(super.getPosition().z >= -400){
+                   super.increaseRotations(0, 180, 0);
+                    super.getPosition().z -= 50;
+                }
+                if(super.getPosition().x <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().x += 50;
+                }
+                if(super.getPosition().z <= -2000){
+                    super.increaseRotations(0, 180, 0);
+                    super.getPosition().z += 50;
+                }
+            }
+
+            float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+            if(super.getPosition().y < terrainHeight)
+                super.getPosition().y = terrainHeight;
+            
+        }
+        
+        if(target!= null){
+            super.increaseRotations(target.getRotX(), target.getRotY(), target.getRotZ());
+            haunting = true;
+            traveling = false;
+        }
+
+        
             
         //Player target = findClosestPlayer(enemies);
         
@@ -103,7 +278,7 @@ public class Player extends Entity {
     }
     
     public Player findClosestPlayer(List<Player> enemies){
-        float closest = 2400;
+        float closest = HAUNTING_AREA;
         Player target = null;
         
         for(Player enemy: enemies){

@@ -154,6 +154,10 @@ public class GameEngine {
                 team1.get(i).moveBot(terrain, team2);
             }
             
+            /*System.out.println("Pos: " + team1.get(1).getPosition());
+            System.out.println("Dest: " + team1.get(1).getDestination());
+            System.out.println("Dis: " + team1.get(1).getDistance(team1.get(1).getDestination()));
+            System.out.println();*/
             for(int i=0; i<team2.size(); i++){
                 team2.get(i).moveBot(terrain, team1);
             }
@@ -187,8 +191,7 @@ public class GameEngine {
                 }
                 explodedMissiles.clear();
             }
-            System.out.println("Pos: " + team1.get(2).getPosition());
-            System.out.println("Dest: " + team1.get(2).getDestination());
+            
             renderer.render(light, camera);
             guiRenderer.render(guis);
             TextMaster.render();
