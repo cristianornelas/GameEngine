@@ -6,6 +6,8 @@
 package toolbox;
 
 import entities.Camera;
+import java.awt.Graphics;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -57,4 +59,21 @@ public class Maths {
         return viewMatrix;
     }
     
+    public static Vector3f PointTo3D(Vector2f point)
+    {
+        int width = Display.getWidth();
+        int height = Display.getHeight();
+        
+        Vector3f newPoint = new Vector3f();
+        int[][] matrix = { {1,0,0,0},
+                           {0,1,0,0},
+                           {0,0,1,0},
+                           {0,0,0,1} };
+    
+        newPoint.x = matrix[0][0] * point.x + matrix[0][1] * point.y + matrix[0][2] * 1.0f + matrix[0][3];
+        newPoint.y = matrix[1][0] * point.x + matrix[1][1] * point.y + matrix[1][2] * 1.0f + matrix[1][3];
+        newPoint.z = matrix[3][0] * point.x + matrix[3][1] * point.y + matrix[3][2] * 1.0f + matrix[3][3];
+        
+        return newPoint;
+    }
 }

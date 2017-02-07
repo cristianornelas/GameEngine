@@ -6,6 +6,7 @@
 package gameengine;
 
 import entities.Ammo;
+import entities.Supplies;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -25,6 +26,7 @@ import renderengine.Loader;
 import models.RawModel;
 import models.TexturedModel;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import renderengine.MasterRenderer;
@@ -43,6 +45,7 @@ public class GameEngine {
     private final static int MISSILE_DMG = 10;
     private final static float MISSILE_SPEED = 200f;
     private final static float MISSILE_DISTANCECAP = 200f;
+    private final static int AMMO_MAX = 500;
     
     public static void main(String[] args) {
                
@@ -55,7 +58,10 @@ public class GameEngine {
         
         RawModel playerModel = OBJLoader.loadObjModel("heli", loader);
         TexturedModel playerTexture1 = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("grey")));
-                
+        
+        RawModel suppliesModel = OBJLoader.loadObjModel("supplies", loader);
+        TexturedModel suppliesTexture = new TexturedModel(suppliesModel, new ModelTexture(loader.loadTexture("supply")));
+        List<Supplies> SuppliesList = new ArrayList<Supplies>();
         
         int seed = new Random().nextInt(1000000000);
         
@@ -63,24 +69,25 @@ public class GameEngine {
         
         List<Player> team1 = new ArrayList<Player>();
         Player player = new Player(playerTexture1, new Vector3f(-Terrain.getSize() + 800f, terrain.getHeightOfTerrain(-Terrain.getSize() + 800f, -500)+5f, -500), 0,180,0,1f);
+        player.setIsBoot(false);
         team1.add(player);
-        for(int i=1; i<10; i++){
+        for(int i=1; i<=1; i++){
             float x = -Terrain.getSize() + 800f + ((800/10) * i);
             team1.add(new Player(playerTexture1, new Vector3f(x , terrain.getHeightOfTerrain(x, -500) , -500), 0,180,0,1f));
         }
         
-        TexturedModel playerTexture2 = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("green")));
+        TexturedModel playerTexture2 = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("enemy")));
         List<Player> team2 = new ArrayList<Player>();
         for(int i=0; i<10; i++){
             float x = -Terrain.getSize() + 800f + ((800/10) * i);
             team2.add(new Player(playerTexture2, new Vector3f(x , terrain.getHeightOfTerrain(x, -1900), -1900), 0, 0,0,1f));
         }
         
-        
         RawModel missileModel = OBJLoader.loadObjModel("missile", loader);
         TexturedModel missileTexture = new TexturedModel(missileModel, new ModelTexture(loader.loadTexture("missileTex")));
         List<Ammo> missiles = new ArrayList<Ammo>();
         List<Ammo> explodedMissiles = new ArrayList<Ammo>();
+        List<Player> explodedPlayers = new ArrayList<Player>();
         
         Camera camera = new Camera(player);       
         Light light = new Light(new Vector3f(20000,40000,20000), new Vector3f(1,1,1)); 
@@ -103,6 +110,19 @@ public class GameEngine {
             }
         }
         
+        for(int i = -15 ; i < 0 ; i++)
+        {
+           
+            float x = random.nextFloat() * Terrain.getSize() / 15 * i;
+            float z = random.nextFloat() * Terrain.getSize() / 15 * -(random.nextInt(15) + 1);
+            float y = terrain.getHeightOfTerrain(x, z);
+        
+            Supplies s = new Supplies(suppliesTexture, new Vector3f(0,0,0), 0, 0, 0, 0.1f);
+            s.setPosition(s.generatePosition(terrain));
+            //SuppliesList.add(new Supplies(suppliesTexture, new Vector3f(x, y, z), 0, 0, 0, 1f));
+            SuppliesList.add(s);
+        }
+        
         
         GUIText text = null;
         
@@ -116,7 +136,7 @@ public class GameEngine {
             if(text != null)
                 TextMaster.removeText(text);
             
-            text = new GUIText("Health: "+ player.getHealth()+" Ammo: "+player.getAmmo() + " - " + player.getKill() + "/" + player.getDeath()+ "/" + player.getAssists(), 1, font, new Vector2f(0,0), 1f, false);
+            text = new GUIText("Health: "+ player.getHealth()+" Ammo: "+player.getAmmo() + "/" + AMMO_MAX + " - Kill: " + player.getKill() + " Death: " + player.getDeath() /* + "/" + player.getAssists()*/, 1, font, new Vector2f(0,0), 1f, false);
             
             if(player.getPosition().x < -400 && player.getPosition().x > -2000 && player.getPosition().z < -400 && player.getPosition().z > -2000)
                 player.move(terrain);
@@ -170,11 +190,30 @@ public class GameEngine {
                 renderer.processEntity(ent);
             }
             
+            for(Supplies ent: SuppliesList){
+                renderer.processEntity(ent);
+            }
+           
+            
             
             if(player.launchMissile()){
+                int posX = Mouse.getX();
+                int posY = Mouse.getY();
                 missiles.add(new Ammo(missileTexture, new Vector3f(player.getPosition().x, player.getPosition().y, player.getPosition().z), MISSILE_DMG, MISSILE_SPEED, MISSILE_DISTANCECAP , player.getRotX(), player.getRotY(), player.getRotZ(), 0.125f));
             }
             
+            if(SuppliesList.size() > 0)
+            {
+                for (Supplies s: SuppliesList)
+                {
+                    if(player.getDistance(s.getPosition()) <= 5 && player.getAmmo() < AMMO_MAX){
+                        player.setAmmo(Math.min(player.getAmmo() + s.getAmmo(), AMMO_MAX));
+                        s.setPosition(s.generatePosition(terrain));
+                        break;
+                    }
+                    
+                }
+            }
             
             if(missiles.size() > 0){
                 for(Ammo missile: missiles){
@@ -182,7 +221,22 @@ public class GameEngine {
                     renderer.processEntity(missile);
                     if(missile.explodeMissile())
                         explodedMissiles.add(missile);
+                    for(Player p: team2)
+                    {
+                        if(p.getDistance(missile.getPosition()) <= 5)
+                        {
+                            p.takeDamage(missile.getDmg());
+                            if(p.getHealth() <= 0)
+                            {
+                                explodedPlayers.add(p);
+                                player.setKill( player.getKill() + 1);
+                            }
+                            //System.out.println(p.getHealth());
+                            explodedMissiles.add(missile);
+                        }
+                    }
                 }
+
             }
             
             if(explodedMissiles.size() > 0){
@@ -190,6 +244,17 @@ public class GameEngine {
                     missiles.remove(exploded);
                 }
                 explodedMissiles.clear();
+            }
+            
+            if(explodedPlayers.size() > 0)
+            {
+               
+                for(Player p: explodedPlayers)
+                {
+                    team1.remove(p);
+                    team2.remove(p);
+                }
+                explodedPlayers.clear();
             }
             
             renderer.render(light, camera);

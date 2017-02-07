@@ -5,11 +5,13 @@
  */
 package entities;
 
+import java.io.Console;
 import java.util.List;
 import java.util.Random;
 import models.TexturedModel;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 import renderengine.DisplayManager;
 import terrain.Terrain;
@@ -21,12 +23,12 @@ import terrain.Terrain;
 public class Player extends Entity {
     
     private static final float RUN_SPEED = 40;
-    private static final float TURN_SPEED = 160;
+    private static final float TURN_SPEED = 60;
     private static final float HAUNTING_AREA = 400;
     private float currentSpeed = 0;
     private float currentTurnSpeed = 0;
-    private int health = 100;
-    private int ammo = 20;
+    private int health = 100; 
+    private int ammo = 100;
     private int kill=0, death=0, assists=0;
     
     private Vector3f destination;
@@ -34,6 +36,22 @@ public class Player extends Entity {
     private boolean traveling = false;
     private Player target = null;
     private boolean haunting = false;
+    private boolean isboot = true;
+    
+    public void takeDamage(int dmg)
+    {
+        this.health = 0 ;//-= dmg;
+    }
+    
+    public boolean getIsBoot()
+    {
+        return isboot;
+    }
+    
+    public void setIsBoot(boolean isboot)
+    {
+        this.isboot = isboot;
+    }
 
     public int getKill() {
         return kill;
@@ -253,9 +271,7 @@ public class Player extends Entity {
             traveling = false;
         }
 
-        
-            
-        //Player target = findClosestPlayer(enemies);
+        Player target = findClosestPlayer(enemies);
         
     }
     
@@ -346,6 +362,9 @@ public class Player extends Entity {
     
     
     public boolean launchMissile(){
+        if(isboot)
+            return true;
+        
         while (Mouse.next()){
             if (Mouse.getEventButtonState()) {
                 if (Mouse.getEventButton() == 0) {
@@ -382,8 +401,28 @@ public class Player extends Entity {
         else{
             this.currentTurnSpeed = 0;
         }
+        /*
+        int posX_max = Display.getWidth()/2 + 50;
+        int posX_min = Display.getWidth()/2 - 50;
+        int mousePosX = Mouse.getX();
+        
+        
+        if(posX_max < mousePosX)
+            this.currentTurnSpeed = -TURN_SPEED;
+        else if(posX_min > mousePosX)
+            this.currentTurnSpeed = TURN_SPEED;
+        else
+            this.currentTurnSpeed = 0;
+*/
     }
     
+    public void attack()
+    {
+        
+    }
     
-    
+    public void follow(Player p)
+    {
+        
+    }
 }
