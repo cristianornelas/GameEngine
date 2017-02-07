@@ -40,7 +40,7 @@ public class Player extends Entity {
     
     public void takeDamage(int dmg)
     {
-        this.health = 0 ;//-= dmg;
+        this.health -= dmg ;//-= dmg;
     }
     
     public boolean getIsBoot()
