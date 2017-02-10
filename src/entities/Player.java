@@ -36,7 +36,9 @@ public class Player extends Entity {
     private boolean traveling = false;
     private Player target = null;
     private boolean haunting = false;
-    private boolean isboot = true;
+    private boolean isbot = true;
+    private Vector3f explosionPosition;
+    private Vector3f helicePosition;
     
     public void takeDamage(int dmg)
     {
@@ -45,12 +47,12 @@ public class Player extends Entity {
     
     public boolean getIsBoot()
     {
-        return isboot;
+        return isbot;
     }
     
-    public void setIsBoot(boolean isboot)
+    public void setIsBot(boolean isboot)
     {
-        this.isboot = isboot;
+        this.isbot = isboot;
     }
 
     public int getKill() {
@@ -80,10 +82,30 @@ public class Player extends Entity {
     
     public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
         super(model, position, rotX, rotY, rotZ, scale);
-    }
+        this.explosionPosition = new Vector3f(position);
+        this.helicePosition = new Vector3f(position);
+        this.explosionPosition.y += 4;
+        this.helicePosition.y += 1;
+     }
 
     public Vector3f getDestination() {
         return destination;
+    }
+
+    public Vector3f getHelicePosition() {
+        return helicePosition;
+    }
+    
+    public void increaseExplosionPosition(float dx, float dy, float dz){
+        this.explosionPosition.x += dx;
+        this.explosionPosition.y += dy;
+        this.explosionPosition.z += dz;
+    }
+    
+    public void increaseHelicePosition(float dx, float dy, float dz){
+        this.helicePosition.x += dx;
+        this.helicePosition.y += dy;
+        this.helicePosition.z += dz;
     }
     
     public void moveBot(Terrain terrain, List<Player> enemies){
@@ -98,32 +120,45 @@ public class Player extends Entity {
             float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
             float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
 
-            float dy = 0.2f;
+            float dy = 0;
             
-            if(destination.y < super.getPosition().y)
+            if(destination.y > super.getPosition().y)
+                dy = 0.2f;
+            else if(destination.y < super.getPosition().y)
                 dy = -dy;
             else if (destination.y == super.getPosition().y)
                 dy = 0;
             
-            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
-                super.increasePosition(dx, 0, dz);
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
+                super.increasePosition(dx, dy, dz);
+                this.increaseExplosionPosition(dx, dy, dz);
+                this.increaseHelicePosition(dx, dy, dz);
+            }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
+                    this.getExplosionPosition().x -= 50;
+                    this.getHelicePosition().x -= 50;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
+                    this.getExplosionPosition().z -= 50;
+                    this.getHelicePosition().z -= 50;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
+                    this.getExplosionPosition().x += 50;
+                    this.getHelicePosition().x += 50;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
+                    this.getExplosionPosition().z += 50;
+                    this.getHelicePosition().z += 50;
                 }
             }
             
@@ -148,32 +183,45 @@ public class Player extends Entity {
             float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
             float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
 
-            float dy = 0.2f;
+            float dy = 0;
             
-            if(destination.y < super.getPosition().y)
+            if(destination.y > super.getPosition().y)
+                dy = 0.2f;
+            else if(destination.y < super.getPosition().y)
                 dy = -dy;
             else if (destination.y == super.getPosition().y)
                 dy = 0;
 
-            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
-                super.increasePosition(dx, 0, dz);
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
+                super.increasePosition(dx, dy, dz);
+                this.increaseExplosionPosition(dx, dy, dz);
+                this.increaseHelicePosition(dx, dy, dz);
+            }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
+                    this.getExplosionPosition().x -= 50;
+                    this.getHelicePosition().x -= 50;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
+                    this.getExplosionPosition().z -= 50;
+                    this.getHelicePosition().z -= 50;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
+                    this.getExplosionPosition().x += 50;
+                    this.getHelicePosition().x += 50;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
+                    this.getExplosionPosition().z += 50;
+                    this.getHelicePosition().z += 50;
                 }
             }
 
@@ -190,32 +238,45 @@ public class Player extends Entity {
             float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
             float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
 
-            float dy = 0.2f;
+            float dy = 0;
             
-            if(destination.y < super.getPosition().y)
+            if(destination.y > super.getPosition().y)
+                dy = 0.2f;
+            else if(destination.y < super.getPosition().y)
                 dy = -dy;
             else if (destination.y == super.getPosition().y)
                 dy = 0;
 
-            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
-                super.increasePosition(dx, 0, dz);
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
+                super.increasePosition(dx, dy, dz);
+                this.increaseExplosionPosition(dx, dy, dz);
+                this.increaseHelicePosition(dx, dy, dz);
+            }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
+                    this.getExplosionPosition().x -= 50;
+                    this.getHelicePosition().x -= 50;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
+                    this.getExplosionPosition().z -= 50;
+                    this.getHelicePosition().z -= 50;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
+                    this.getExplosionPosition().x += 50;
+                    this.getHelicePosition().x += 50;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
+                    this.getExplosionPosition().z += 50;
+                    this.getHelicePosition().z += 50;
                 }
             }
 
@@ -230,32 +291,45 @@ public class Player extends Entity {
             float dx = (float) (distancePerSecond * Math.sin(Math.toRadians(super.getRotY())));
             float dz = (float) (distancePerSecond * Math.cos(Math.toRadians(super.getRotY())));
 
-            float dy = 0.2f;
+            float dy = 0;
             
-            if(target.getPosition().y < super.getPosition().y)
+            if(target.getPosition().y > super.getPosition().y)
+                dy = 0.2f;
+            else if(target.getPosition().y < super.getPosition().y)
                 dy = -dy;
             else if (target.getPosition().y == super.getPosition().y)
                 dy = 0;
 
-            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000)
-                super.increasePosition(dx, 0, dz);
+            if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
+                super.increasePosition(dx, dy, dz);
+                this.increaseExplosionPosition(dx, dy, dz);
+                this.increaseHelicePosition(dx, dy, dz);
+            }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
+                    this.getExplosionPosition().x -= 50;
+                    this.getHelicePosition().x -= 50;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
+                    this.getExplosionPosition().z -= 50;
+                    this.getHelicePosition().z -= 50;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
+                    this.getExplosionPosition().x += 50;
+                    this.getHelicePosition().x += 50;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
+                    this.getExplosionPosition().z += 50;
+                    this.getHelicePosition().z += 50;
                 }
             }
 
@@ -274,6 +348,12 @@ public class Player extends Entity {
         Player target = findClosestPlayer(enemies);
         
     }
+
+    public Vector3f getExplosionPosition() {
+        return explosionPosition;
+    }
+    
+    
     
     public Vector3f randomWalk(Terrain terrain){
         float minX = -2000;
@@ -286,7 +366,7 @@ public class Player extends Entity {
         float z = random.nextFloat() * (maxZ - minZ) + minZ;
         
         float minY = terrain.getHeightOfTerrain(x, z);
-        float maxY = 500;
+        float maxY = 200;
         
         float y = random.nextFloat() * (maxY - minY) + minY;
         
@@ -330,15 +410,24 @@ public class Player extends Entity {
         float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
         float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
         super.increasePosition(dx, 0.0f, dz);
+        this.increaseExplosionPosition(dx, 0.0f, dz);
+        this.increaseHelicePosition(dx, 0.0f, dz);
         float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
-        if(super.getPosition().y < terrainHeight)
+        if(super.getPosition().y < terrainHeight){
             super.getPosition().y = terrainHeight;
+            this.getExplosionPosition().y = terrainHeight + 4;
+            this.getHelicePosition().y = terrainHeight + 1;
+        }
         
         if(Keyboard.isKeyDown(Keyboard.KEY_SPACE) && super.getPosition().y < 500){
             super.increasePosition(0, 0.2f, 0);
+            this.increaseExplosionPosition(0, 0.2f, 0);
+            this.increaseHelicePosition(0, 0.2f, 0);
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
             super.increasePosition(0, -0.2f, 0);
+            this.increaseExplosionPosition(0, -0.2f, 0);
+            this.increaseHelicePosition(0, -0.2f, 0);
         }
         
     }
@@ -362,7 +451,7 @@ public class Player extends Entity {
     
     
     public boolean launchMissile(){
-        if(isboot)
+        if(isbot)
             return true;
         
         while (Mouse.next()){

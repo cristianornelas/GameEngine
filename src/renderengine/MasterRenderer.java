@@ -116,4 +116,10 @@ public class MasterRenderer {
         shader.cleanUp();
         terrainShader.cleanUp();
     }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+    
+    
 }
