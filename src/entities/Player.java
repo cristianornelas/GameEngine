@@ -131,34 +131,34 @@ public class Player extends Entity {
             
             if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
                 super.increasePosition(dx, dy, dz);
-                this.increaseExplosionPosition(dx, dy, dz);
-                this.increaseHelicePosition(dx, dy, dz);
+               	explosionPosition = new Vector3f(super.getPosition());
+                helicePosition = new Vector3f(super.getPosition());
             }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
-                    this.getExplosionPosition().x -= 50;
-                    this.getHelicePosition().x -= 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x  = super.getPosition().x;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
-                    this.getExplosionPosition().z -= 50;
-                    this.getHelicePosition().z -= 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
-                    this.getExplosionPosition().x += 50;
-                    this.getHelicePosition().x += 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x = super.getPosition().x;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
-                    this.getExplosionPosition().z += 50;
-                    this.getHelicePosition().z += 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
             }
             
@@ -194,34 +194,34 @@ public class Player extends Entity {
 
             if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
                 super.increasePosition(dx, dy, dz);
-                this.increaseExplosionPosition(dx, dy, dz);
-                this.increaseHelicePosition(dx, dy, dz);
+               	explosionPosition = new Vector3f(super.getPosition());
+                helicePosition = new Vector3f(super.getPosition());
             }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
-                    this.getExplosionPosition().x -= 50;
-                    this.getHelicePosition().x -= 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x  = super.getPosition().x;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
-                    this.getExplosionPosition().z -= 50;
-                    this.getHelicePosition().z -= 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
-                    this.getExplosionPosition().x += 50;
-                    this.getHelicePosition().x += 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x = super.getPosition().x;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
-                    this.getExplosionPosition().z += 50;
-                    this.getHelicePosition().z += 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
             }
 
@@ -249,34 +249,34 @@ public class Player extends Entity {
 
             if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
                 super.increasePosition(dx, dy, dz);
-                this.increaseExplosionPosition(dx, dy, dz);
-                this.increaseHelicePosition(dx, dy, dz);
+               	explosionPosition = new Vector3f(super.getPosition());
+                helicePosition = new Vector3f(super.getPosition());
             }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
-                    this.getExplosionPosition().x -= 50;
-                    this.getHelicePosition().x -= 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x  = super.getPosition().x;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
-                    this.getExplosionPosition().z -= 50;
-                    this.getHelicePosition().z -= 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
-                    this.getExplosionPosition().x += 50;
-                    this.getHelicePosition().x += 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x = super.getPosition().x;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
-                    this.getExplosionPosition().z += 50;
-                    this.getHelicePosition().z += 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
             }
 
@@ -302,36 +302,37 @@ public class Player extends Entity {
 
             if(super.getPosition().x < -400 && super.getPosition().x > -2000 && super.getPosition().z < -400 && super.getPosition().z > -2000){
                 super.increasePosition(dx, dy, dz);
-                this.increaseExplosionPosition(dx, dy, dz);
-                this.increaseHelicePosition(dx, dy, dz);
+               	explosionPosition = new Vector3f(super.getPosition());
+                helicePosition = new Vector3f(super.getPosition());
             }
             else{
                 //Limita o player ao terreno, se sair, da meia volta [ COLOCAR MSG AVISANDO QUE TA SAINDO ]
                 if(super.getPosition().x >= -400){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x -= 50;
-                    this.getExplosionPosition().x -= 50;
-                    this.getHelicePosition().x -= 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x  = super.getPosition().x;
                 }
                 if(super.getPosition().z >= -400){
                    super.increaseRotations(0, 180, 0);
                     super.getPosition().z -= 50;
-                    this.getExplosionPosition().z -= 50;
-                    this.getHelicePosition().z -= 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
                 if(super.getPosition().x <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().x += 50;
-                    this.getExplosionPosition().x += 50;
-                    this.getHelicePosition().x += 50;
+                    this.getExplosionPosition().x = super.getPosition().x;
+                    this.getHelicePosition().x = super.getPosition().x;
                 }
                 if(super.getPosition().z <= -2000){
                     super.increaseRotations(0, 180, 0);
                     super.getPosition().z += 50;
-                    this.getExplosionPosition().z += 50;
-                    this.getHelicePosition().z += 50;
+                    this.getExplosionPosition().z = super.getPosition().z;
+                    this.getHelicePosition().z = super.getPosition().z;
                 }
             }
+            
 
             float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
             if(super.getPosition().y < terrainHeight)

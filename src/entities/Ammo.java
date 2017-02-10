@@ -18,7 +18,7 @@ public class Ammo extends Entity{
     
     int dmg;
     float speed;
-    float distanceCapacity = 800;
+    float distanceCapacity = 1000;
 
     public Ammo(TexturedModel model, Vector3f position, int damage, float speed, float distanceCapacity, float rotX, float rotY, float rotZ, float scale) {
         super(model, position, rotX, rotY, rotZ, scale);
