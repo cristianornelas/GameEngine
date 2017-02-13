@@ -12,13 +12,13 @@ The game is played at a desert in a 3D environment. The player can move in all d
 Playing is easy! You will only use:
 
 Os controles disponíveis para o usuário são:
-- W 	 Move para frente
-- A 	 Move para a esquerda
-- D 	 Move para a direita
-- S 	 Move para trás
-- SHIFT 	 Move para baixo
-- SPACE	 Move para cima
-- CLICK 	 Lança míssil
+- W -> Move para frente
+- A -> Move para a esquerda
+- D -> Move para a direita
+- S -> Move para trás
+- SHIFT -> Move para baixo
+- SPACE -> Move para cima
+- CLICK -> Lança míssil
 
 What was used?
 -------------
